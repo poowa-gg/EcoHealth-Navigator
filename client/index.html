@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoHealth Navigator - Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .health-recommendations {
+            grid-column: 1 / -1;
+        }
+
+        .recommendation {
+            background: #f7fafc;
+            border-left: 4px solid #48bb78;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .recommendation.moderate {
+            border-left-color: #ed8936;
+        }
+
+        .recommendation.high {
+            border-left-color: #e53e3e;
+        }
+
+        .environmental-data {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .data-point {
+            text-align: center;
+            padding: 15px;
+            background: #edf2f7;
+            border-radius: 10px;
+        }
+
+        .data-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .data-label {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        .challenges {
+            display: grid;
+            gap: 15px;
+        }
+
+        .challenge {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .challenge-title {
+            font-weight: bold;
+            color: #2f855a;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 8px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: #48bb78;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .btn {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #3182ce;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-good { background: #48bb78; }
+        .status-moderate { background: #ed8936; }
+        .status-poor { background: #e53e3e; }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌱 EcoHealth Navigator</h1>
+            <p>AI-Powered Community Health & Environmental Impact Platform</p>
+        </div>
+
+        <div class="dashboard">
+            <div class="card">
+                <h3>🌡️ Environmental Data</h3>
+                <div class="environmental-data" id="environmentalData">
+                    <div class="data-point">
+                        <div class="data-value" id="aqi">--</div>
+                        <div class="data-label">Air Quality Index</div>
+                    </div>
+                    <div class="data-point">
+                        <div class="data-value" id="temperature">--°F</div>
+                        <div class="data-label">Temperature</div>
+                    </div>
+                    <div class="data-point">
+                        <div class="data-value" id="uvIndex">--</div>
+                        <div class="data-label">UV Index</div>
+                    </div>
+                    <div class="data-point">
+                        <div class="data-value" id="pollen">--</div>
+                        <div class="data-label">Pollen Count</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🏆 Community Challenges</h3>
+                <div class="challenges" id="challenges">
+                    <!-- Challenges will be loaded here -->
+                </div>
+            </div>
+
+            <div class="card health-recommendations">
+                <h3>💡 AI Health Recommendations</h3>
+                <div id="recommendations">
+                    <!-- Recommendations will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io('http://localhost:3001');
+        const userId = 'demo-user-' + Math.random().toString(36).substr(2, 9);
+
+        // Load initial data
+        async function loadData() {
+            try {
+                // Load health recommendations
+                const healthResponse = await fetch(`http://localhost:3001/api/health-recommendations/${userId}?location=downtown`);
+                const healthData = await healthResponse.json();
+                
+                if (healthData.success) {
+                    updateEnvironmentalData(healthData.data.environmentalData);
+                    updateRecommendations(healthData.data.recommendations);
+                }
+
+                // Load community challenges
+                const communityResponse = await fetch('http://localhost:3001/api/community/green-valley/challenges');
+                const communityData = await communityResponse.json();
+                
+                if (communityData.success) {
+                    updateChallenges(communityData.data.challenges);
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+
+        function updateEnvironmentalData(data) {
+            document.getElementById('aqi').textContent = data.aqi;
+            document.getElementById('temperature').textContent = data.temperature + '°F';
+            document.getElementById('uvIndex').textContent = data.uvIndex;
+            document.getElementById('pollen').textContent = data.pollenCount;
+        }
+
+        function updateRecommendations(recommendations) {
+            const container = document.getElementById('recommendations');
+            container.innerHTML = '';
+
+            recommendations.forEach(rec => {
+                const div = document.createElement('div');
+                div.className = `recommendation ${rec.severity}`;
+                div.innerHTML = `
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <span class="status-indicator status-${rec.severity === 'high' ? 'poor' : rec.severity === 'moderate' ? 'moderate' : 'good'}"></span>
+                        <strong>${rec.type.replace('_', ' ').toUpperCase()}</strong>
+                    </div>
+                    <div>${rec.message}</div>
+                    <div style="margin-top: 8px; font-size: 0.9rem; color: #4a5568;">
+                        💡 ${rec.action}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateChallenges(challenges) {
+            const container = document.getElementById('challenges');
+            container.innerHTML = '';
+
+            challenges.forEach(challenge => {
+                const div = document.createElement('div');
+                div.className = 'challenge';
+                div.innerHTML = `
+                    <div class="challenge-header">
+                        <div class="challenge-title">${challenge.title}</div>
+                        <div>${challenge.participants.length} participants</div>
+                    </div>
+                    <div style="font-size: 0.9rem; color: #4a5568; margin-bottom: 10px;">
+                        ${challenge.description}
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${challenge.progress}%"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                        <span style="font-size: 0.9rem;">${challenge.progress}% complete</span>
+                        <button class="btn" onclick="joinChallenge('${challenge.id}')">Join Challenge</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        async function joinChallenge(challengeId) {
+            try {
+                const response = await fetch('http://localhost:3001/api/community/green-valley/join-challenge', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userId: userId,
+                        challengeId: challengeId
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Successfully joined the challenge! 🎉');
+                    loadData(); // Refresh data
+                }
+            } catch (error) {
+                console.error('Error joining challenge:', error);
+            }
+        }
+
+        // Socket.IO event listeners
+        socket.on('environmentalUpdate', (data) => {
+            if (data.location === 'downtown') {
+                updateEnvironmentalData(data.data);
+            }
+        });
+
+        socket.on('challengeUpdate', (challenge) => {
+            loadData(); // Refresh challenges
+        });
+
+        // Join community for real-time updates
+        socket.emit('joinCommunity', 'green-valley');
+
+        // Load initial data
+        loadData();
+
+        // Refresh data every 30 seconds
+        setInterval(loadData, 30000);
+    </script>
+</body>
+</html>
